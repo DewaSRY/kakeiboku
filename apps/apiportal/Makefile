@@ -76,5 +76,7 @@ migrate-up:
 migrate-down:
 	migrate -path internal/database/migrations -database "$(DB_URI)" -verbose down
 
+sqlc: 
+	sqlc generate
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down
+.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc
