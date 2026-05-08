@@ -3,13 +3,11 @@ package test
 import (
 	"context"
 	"log"
-	"math/big"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 
@@ -109,6 +107,3 @@ func runMigrations(dbURI string) {
 	}
 }
 
-func intToPgTypeNumeric(num int) pgtype.Numeric {
-	return pgtype.Numeric{Int: big.NewInt(int64(num)), Valid: true}
-}

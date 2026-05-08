@@ -4,45 +4,22 @@ import (
 	"context"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v7"
 	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/database/sqlc"
 	"github.com/stretchr/testify/require"
 )
 
+
+
 func TestCreateTransferTx_Integration(t *testing.T) {
 	ctx := context.Background()
-
-	user, err := testStore.CreateUser(ctx, db.CreateUserParams{
-		FirstName:    gofakeit.NamePrefix(),
-		LastName:     gofakeit.Name(),
-		Email:        gofakeit.Email(),
-		PasswordHash: "",
-	})
-	require.NoError(t, err)
-
-	// Create two accounts
-	fromAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
-		UserID:   user.ID,
-		Balance:  intToPgTypeNumeric(100),
-		Currency: "USD",
-	})
-
-	require.NoError(t, err)
-
-	toAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
-		UserID:   user.ID,
-		Balance:  intToPgTypeNumeric(50),
-		Currency: "USD",
-	})
-
-	require.NoError(t, err)
-
+	user := createTestUser(t, ctx)
+	fromAccount := createTestAccount(t, ctx, user.ID, intToPgTypeNumeric(100), "USD")
+	toAccount := createTestAccount(t, ctx, user.ID, intToPgTypeNumeric(50), "USD")
 	amount := intToPgTypeNumeric(10)
 
-	// test for concurrent situation
 	const num = 5
 	errors := make(chan error, num)
-	result := make(chan *db.Transfer, num)
+	results := make(chan *db.Transfer, num)
 
 	for i := 0; i < num; i++ {
 		go func() {
@@ -52,7 +29,7 @@ func TestCreateTransferTx_Integration(t *testing.T) {
 				Amount:        amount,
 			})
 			errors <- err
-			result <- transfer
+			results <- transfer
 		}()
 	}
 
@@ -60,42 +37,18 @@ func TestCreateTransferTx_Integration(t *testing.T) {
 		err := <-errors
 		require.NoError(t, err)
 
-		transfer := <-result
-		require.NoError(t, err)
+		transfer := <-results
 		require.NotNil(t, transfer)
 		require.Equal(t, fromAccount.ID, transfer.FromAccountID)
 		require.Equal(t, toAccount.ID, transfer.ToAccountID)
 	}
-
 }
 
 func TestTransferTx_InsufficientBalance_Integration(t *testing.T) {
 	ctx := context.Background()
-	user, err := testStore.CreateUser(ctx, db.CreateUserParams{
-		FirstName:    gofakeit.NamePrefix(),
-		LastName:     gofakeit.Name(),
-		Email:        gofakeit.Email(),
-		PasswordHash: "",
-	})
-	require.NoError(t, err)
-
-	// Create two accounts
-	fromAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
-		UserID:   user.ID,
-		Balance:  intToPgTypeNumeric(100),
-		Currency: "USD",
-	})
-
-	require.NoError(t, err)
-
-	toAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
-		UserID:   user.ID,
-		Balance:  intToPgTypeNumeric(50),
-		Currency: "USD",
-	})
-
-	require.NoError(t, err)
-
+	user := createTestUser(t, ctx)
+	fromAccount := createTestAccount(t, ctx, user.ID, intToPgTypeNumeric(100), "USD")
+	toAccount := createTestAccount(t, ctx, user.ID, intToPgTypeNumeric(50), "USD")
 	amount := intToPgTypeNumeric(1000)
 
 	transfer, err := testStore.CreateTransferTx(ctx, db.CreateTransactionParams{
@@ -105,6 +58,5 @@ func TestTransferTx_InsufficientBalance_Integration(t *testing.T) {
 	})
 	require.Nil(t, transfer)
 	require.Error(t, err)
-
 }
 
