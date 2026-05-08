@@ -5,6 +5,7 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	DB_URI  string `mapstructure:"DB_URI"`
+	Port    int    `mapstructure:"PORT"`
 }
 
 
