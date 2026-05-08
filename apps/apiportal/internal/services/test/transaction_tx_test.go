@@ -34,6 +34,7 @@ func TestCreateTransferTx_Integration(t *testing.T) {
 		Balance:  intToPgTypeNumeric(50),
 		Currency: "USD",
 	})
+
 	require.NoError(t, err)
 
 	amount := intToPgTypeNumeric(10)
@@ -68,31 +69,42 @@ func TestCreateTransferTx_Integration(t *testing.T) {
 
 }
 
-// func TestAddBalance_NegativeBalance_Integration(t *testing.T) {
-// 	dbUrl := os.Getenv("TEST_DATABASE_URL")
-// 	if dbUrl == "" {
-// 		t.Skip("TEST_DATABASE_URL not set")
-// 	}
-// 	dbConn, err := db.OpenDB(dbUrl)
-// 	require.NoError(t, err)
-// 	defer dbConn.Close()
+func TestTransferTx_InsufficientBalance_Integration(t *testing.T) {
+	ctx := context.Background()
+	user, err := testStore.CreateUser(ctx, db.CreateUserParams{
+		FirstName:    gofakeit.NamePrefix(),
+		LastName:     gofakeit.Name(),
+		Email:        gofakeit.Email(),
+		PasswordHash: "",
+	})
+	require.NoError(t, err)
 
-// 	queries := db.New(dbConn)
+	// Create two accounts
+	fromAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
+		UserID:   user.ID,
+		Balance:  intToPgTypeNumeric(100),
+		Currency: "USD",
+	})
 
-// 	ctx := context.Background()
+	require.NoError(t, err)
 
-// 	account, err := queries.CreateAccount(ctx, db.CreateAccountParams{
-// 		Owner:    "test_user",
-// 		Balance:  pgtype.Numeric{Int: big.NewInt(0)},
-// 		Currency: "USD",
-// 	})
-// 	require.NoError(t, err)
+	toAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
+		UserID:   user.ID,
+		Balance:  intToPgTypeNumeric(50),
+		Currency: "USD",
+	})
 
-// 	_, err = services._addBalance(ctx, queries, services._AddBalanceArgs{
-// 		accountId: account.ID,
-// 		amount:    pgtype.Numeric{Int: big.NewInt(-1)},
-// 	})
-// 	require.ErrorIs(t, err, services.ErrBalanceIsNegative)
+	require.NoError(t, err)
 
-// 	_ = queries.DeleteAccount(ctx, account.ID)
-// }
+	amount := intToPgTypeNumeric(1000)
+
+	transfer, err := testStore.CreateTransferTx(ctx, db.CreateTransactionParams{
+		FromAccountID: fromAccount.ID,
+		ToAccountID:   toAccount.ID,
+		Amount:        amount,
+	})
+	require.Nil(t, transfer)
+	require.Error(t, err)
+
+}
+
