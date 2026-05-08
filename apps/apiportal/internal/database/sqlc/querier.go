@@ -12,8 +12,10 @@ type Querier interface {
 	CreateAccounts(ctx context.Context, arg CreateAccountsParams) (Account, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transfer, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetAccountByID(ctx context.Context, id int64) (Account, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
+	UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) (Account, error)
 	UpdateUserById(ctx context.Context, arg UpdateUserByIdParams) (User, error)
 }
 

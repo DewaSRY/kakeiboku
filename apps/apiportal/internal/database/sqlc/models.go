@@ -6,15 +6,17 @@ package db
 
 import (
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Account struct {
-	ID        int64     `json:"id"`
-	UserID    int64     `json:"user_id"`
-	Balance   int64     `json:"balance"`
-	Currency  string    `json:"currency"`
-	CreatedAt time.Time `json:"created_at"`
-	DeletedAt time.Time `json:"deleted_at"`
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	Balance   pgtype.Numeric `json:"balance"`
+	Currency  string         `json:"currency"`
+	CreatedAt time.Time      `json:"created_at"`
+	DeletedAt time.Time      `json:"deleted_at"`
 }
 
 type Transfer struct {
@@ -22,8 +24,8 @@ type Transfer struct {
 	FromAccountID int64 `json:"from_account_id"`
 	ToAccountID   int64 `json:"to_account_id"`
 	// must be positive
-	Amount    int64     `json:"amount"`
-	CreatedAt time.Time `json:"created_at"`
+	Amount    pgtype.Numeric `json:"amount"`
+	CreatedAt time.Time      `json:"created_at"`
 }
 
 type User struct {

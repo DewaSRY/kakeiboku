@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createAccounts = `-- name: CreateAccounts :one
@@ -19,13 +21,60 @@ RETURNING id, user_id, balance, currency, created_at, deleted_at
 `
 
 type CreateAccountsParams struct {
-	UserID   int64  `json:"user_id"`
-	Balance  int64  `json:"balance"`
-	Currency string `json:"currency"`
+	UserID   int64          `json:"user_id"`
+	Balance  pgtype.Numeric `json:"balance"`
+	Currency string         `json:"currency"`
 }
 
 func (q *Queries) CreateAccounts(ctx context.Context, arg CreateAccountsParams) (Account, error) {
 	row := q.db.QueryRow(ctx, createAccounts, arg.UserID, arg.Balance, arg.Currency)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Balance,
+		&i.Currency,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getAccountByID = `-- name: GetAccountByID :one
+SELECT id, user_id, balance, currency, created_at, deleted_at FROM "accounts" WHERE id = $1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetAccountByID(ctx context.Context, id int64) (Account, error) {
+	row := q.db.QueryRow(ctx, getAccountByID, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Balance,
+		&i.Currency,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateAccountBalance = `-- name: UpdateAccountBalance :one
+UPDATE "accounts"
+SET
+  balance = balance + $1
+WHERE
+  id = $2
+RETURNING id, user_id, balance, currency, created_at, deleted_at
+`
+
+type UpdateAccountBalanceParams struct {
+	Amount pgtype.Numeric `json:"amount"`
+	ID     int64          `json:"id"`
+}
+
+func (q *Queries) UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) (Account, error) {
+	row := q.db.QueryRow(ctx, updateAccountBalance, arg.Amount, arg.ID)
 	var i Account
 	err := row.Scan(
 		&i.ID,

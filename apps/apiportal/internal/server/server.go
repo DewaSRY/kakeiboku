@@ -7,9 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/database"
 	_ "github.com/joho/godotenv/autoload"
-
-	"apiportal/internal/database"
 )
 
 type Server struct {

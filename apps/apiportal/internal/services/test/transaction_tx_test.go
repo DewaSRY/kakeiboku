@@ -1,0 +1,98 @@
+package test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/brianvoe/gofakeit/v7"
+	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/database/sqlc"
+	"github.com/stretchr/testify/require"
+)
+
+func TestCreateTransferTx_Integration(t *testing.T) {
+	ctx := context.Background()
+
+	user, err := testStore.CreateUser(ctx, db.CreateUserParams{
+		FirstName:    gofakeit.NamePrefix(),
+		LastName:     gofakeit.Name(),
+		Email:        gofakeit.Email(),
+		PasswordHash: "",
+	})
+	require.NoError(t, err)
+
+	// Create two accounts
+	fromAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
+		UserID:   user.ID,
+		Balance:  intToPgTypeNumeric(100),
+		Currency: "USD",
+	})
+
+	require.NoError(t, err)
+
+	toAccount, err := testStore.CreateAccounts(ctx, db.CreateAccountsParams{
+		UserID:   user.ID,
+		Balance:  intToPgTypeNumeric(50),
+		Currency: "USD",
+	})
+	require.NoError(t, err)
+
+	amount := intToPgTypeNumeric(10)
+
+	// test for concurrent situation
+	const num = 5
+	errors := make(chan error, num)
+	result := make(chan *db.Transfer, num)
+
+	for i := 0; i < num; i++ {
+		go func() {
+			transfer, err := testStore.CreateTransferTx(ctx, db.CreateTransactionParams{
+				FromAccountID: fromAccount.ID,
+				ToAccountID:   toAccount.ID,
+				Amount:        amount,
+			})
+			errors <- err
+			result <- transfer
+		}()
+	}
+
+	for i := 0; i < num; i++ {
+		err := <-errors
+		require.NoError(t, err)
+
+		transfer := <-result
+		require.NoError(t, err)
+		require.NotNil(t, transfer)
+		require.Equal(t, fromAccount.ID, transfer.FromAccountID)
+		require.Equal(t, toAccount.ID, transfer.ToAccountID)
+	}
+
+}
+
+// func TestAddBalance_NegativeBalance_Integration(t *testing.T) {
+// 	dbUrl := os.Getenv("TEST_DATABASE_URL")
+// 	if dbUrl == "" {
+// 		t.Skip("TEST_DATABASE_URL not set")
+// 	}
+// 	dbConn, err := db.OpenDB(dbUrl)
+// 	require.NoError(t, err)
+// 	defer dbConn.Close()
+
+// 	queries := db.New(dbConn)
+
+// 	ctx := context.Background()
+
+// 	account, err := queries.CreateAccount(ctx, db.CreateAccountParams{
+// 		Owner:    "test_user",
+// 		Balance:  pgtype.Numeric{Int: big.NewInt(0)},
+// 		Currency: "USD",
+// 	})
+// 	require.NoError(t, err)
+
+// 	_, err = services._addBalance(ctx, queries, services._AddBalanceArgs{
+// 		accountId: account.ID,
+// 		amount:    pgtype.Numeric{Int: big.NewInt(-1)},
+// 	})
+// 	require.ErrorIs(t, err, services.ErrBalanceIsNegative)
+
+// 	_ = queries.DeleteAccount(ctx, account.ID)
+// }

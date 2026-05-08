@@ -11,7 +11,7 @@ CREATE TABLE "user" (
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
   "user_id" bigserial NOT NULL,
-  "balance" bigint NOT NULL,
+  "balance" numeric(20, 2) NOT NULL,
   "currency" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz NOT NULL DEFAULT (now())
@@ -21,7 +21,7 @@ CREATE TABLE "transfers" (
   "id" bigserial PRIMARY KEY,
   "from_account_id" bigint NOT NULL,
   "to_account_id" bigint NOT NULL,
-  "amount" bigint NOT NULL DEFAULT 0,
+  "amount"  numeric(20, 2) NOT NULL DEFAULT 0,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
