@@ -79,4 +79,9 @@ migrate-down:
 sqlc: 
 	sqlc generate
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc
+
+test: 
+	@echo "Running tests..."
+	@go test -v ./...
+
+.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc test

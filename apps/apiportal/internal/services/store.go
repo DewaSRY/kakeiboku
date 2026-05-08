@@ -13,6 +13,7 @@ import (
 type Store interface {
 	db.Querier
 	CreateTransferTx(ctx context.Context, arg db.CreateTransactionParams) (*db.Transfer, error)
+	
 }
 
 // SqlStore provides all function to execute sql queries and transaction
