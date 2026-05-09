@@ -23,7 +23,7 @@ func (s *Server) CreateAccountHandler(ctx *gin.Context) {
 
 	
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
 
@@ -34,10 +34,10 @@ func (s *Server) CreateAccountHandler(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, commonResponse("success create account"))
+	ctx.JSON(http.StatusCreated, utils.CommonResponse("success create account"))
 
 }

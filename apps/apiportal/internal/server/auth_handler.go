@@ -13,14 +13,14 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 	var req SignupRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
 
 	// create user
 	hash_password, err := utils.HashPassword(req.Password)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 	user_created, err := server.store.CreateUser(ctx, services.CreateUserParams{
@@ -31,7 +31,7 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
@@ -42,7 +42,7 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		server.config.AccessTokenDuration,
 		token.TokenTypeAccessToken)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
@@ -52,7 +52,7 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		server.config.RefreshTokenDuration,
 		token.TokenTypeRefreshToken)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
@@ -64,7 +64,7 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		ClientIp:     ctx.ClientIP(),
 	})
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
@@ -82,19 +82,19 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 	var req LoginRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
 
 	user, err := server.store.GetUserByEmail(ctx, req.Email)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
 	}
 
 	err = utils.CheckPassword(req.Password, user.PasswordHash)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
 	}
 
@@ -105,7 +105,7 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 		server.config.AccessTokenDuration,
 		token.TokenTypeAccessToken)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
@@ -115,7 +115,7 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 		server.config.RefreshTokenDuration,
 		token.TokenTypeRefreshToken)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
@@ -128,7 +128,7 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
