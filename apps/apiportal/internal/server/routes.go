@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -17,12 +18,20 @@ func (server *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
-	router.GET("/", server.HelloWorldHandler)
-	router.GET("/health", server.healthHandler)
+	v1_routes := router.Group("/v1")
+	v1_routes.Use(middleware.WebMiddleware)
+	v1_routes.GET("/", server.HelloWorldHandler)
+	v1_routes.GET("/health", server.healthHandler)
 
-	account_routes := router.Group("/accounts") 
+	auth_routes := v1_routes.Group("/auth")
+	auth_routes.POST("/login", server.LoginHandler)
+	auth_routes.POST("/signup", server.SignUpHandler)
+
+	account_routes := v1_routes.Group("/accounts")
+	account_routes.Use(middleware.AuthMiddleware(server.token))
 
 	account_routes.POST("/", server.CreateAccountHandler)
+
 	return router
 }
 

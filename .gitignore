@@ -68,3 +68,4 @@ main
 
 
 *.env
+app.env

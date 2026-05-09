@@ -2,11 +2,7 @@ package server
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
-
-
 
 type SignupRequest struct {
 	Email    string `json:"email" binding:"required"`
@@ -14,7 +10,6 @@ type SignupRequest struct {
 	LastName  string `json:"last_name"`
 	Password string `json:"password" binding:"required"`
 }
-
 
 type LoginRequest struct {
 	Email    string `json:"email" binding:"required"`
@@ -27,8 +22,7 @@ type LoginResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }	
 
-type loginUserResponse struct {
-	SessionID             uuid.UUID    `json:"session_id"`
+type AuthResponse struct {
 	AccessToken           string       `json:"access_token"`
 	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
 	RefreshToken          string       `json:"refresh_token"`
@@ -40,6 +34,3 @@ type RefreshTokenRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
-type RefreshTokenResponse struct {
-	AccessToken string `json:"access_token"`
-}
