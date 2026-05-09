@@ -5,7 +5,6 @@ import (
 	"errors"
 	"math/big"
 
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/database/sqlc"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -13,10 +12,10 @@ var (
 	ErrBalanceIsNegative = errors.New("account balance is negative")
 )
 
-func (t *SQLStore) CreateTransferTx(ctx context.Context, arg db.CreateTransactionParams) (*db.Transfer, error) {
-	var result db.Transfer
+func (t *SQLStore) CreateTransferTx(ctx context.Context, arg CreateTransactionParams) (*Transfer, error) {
+	var result Transfer
 
-	if err := t.ExecTX(ctx, func(q *db.Queries) error {
+	if err := t.ExecTX(ctx, func(q *Queries) error {
 		// transfer money from account (sender) to account (receiver)
 		fromA, err := q.GetAccountByID(ctx, arg.FromAccountID)
 		if err != nil {
@@ -72,7 +71,7 @@ func (t *SQLStore) CreateTransferTx(ctx context.Context, arg db.CreateTransactio
 		}
 
 		// create the transaction
-		result, err = q.CreateTransaction(ctx, db.CreateTransactionParams{
+		result, err = q.CreateTransaction(ctx, CreateTransactionParams{
 			FromAccountID: arg.FromAccountID,
 			ToAccountID:   arg.ToAccountID,
 			Amount:        arg.Amount,
@@ -96,8 +95,8 @@ type _AddBalanceArgs struct {
 	amount    pgtype.Numeric
 }
 
-func _addBalance(ctx context.Context, q *db.Queries, arg _AddBalanceArgs) (account db.Account, err error) {
-	account, err = q.UpdateAccountBalance(ctx, db.UpdateAccountBalanceParams{
+func _addBalance(ctx context.Context, q *Queries, arg _AddBalanceArgs) (account Account, err error) {
+	account, err = q.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
 		ID:     arg.accountId,
 		Amount: arg.amount,
 	})

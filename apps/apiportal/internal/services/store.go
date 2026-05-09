@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/database/sqlc"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 // Store defines all function to execute db queries and transaction
 type Store interface {
-	db.Querier
-	CreateTransferTx(ctx context.Context, arg db.CreateTransactionParams) (*db.Transfer, error)
+	Querier
+	CreateTransferTx(ctx context.Context, arg CreateTransactionParams) (*Transfer, error)
 	
 }
 
@@ -20,24 +19,24 @@ type Store interface {
 
 type SQLStore struct {
 	connPool *pgxpool.Pool
-	*db.Queries
+	*Queries
 }
 
 func NewStore(connPool *pgxpool.Pool) Store {
 	return &SQLStore{
 		connPool: connPool,
-		Queries:  db.New(connPool),
+		Queries:  New(connPool),
 	}
 }
 
 // ExecTX executes a function within a database transaction
-func (t *SQLStore) ExecTX(ctx context.Context, fn func(*db.Queries) error) error {
+func (t *SQLStore) ExecTX(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := t.connPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	q := db.New(tx)
+	q := New(tx)
 	err = fn(q)
 
 	if err != nil {

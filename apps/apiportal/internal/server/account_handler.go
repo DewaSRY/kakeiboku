@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/database/sqlc"
+	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
 	"github.com/gin-gonic/gin"
 )

@@ -1,5 +1,5 @@
 # Simple Makefile for a Go project
-include .env
+include app.env
 export
 
 
@@ -37,6 +37,7 @@ docker-down:
 test:
 	@echo "Testing..."
 	@go test ./... -v
+
 # Integrations Tests for the application
 itest:
 	@echo "Running integration tests..."
@@ -79,9 +80,7 @@ migrate-down:
 sqlc: 
 	sqlc generate
 
-
-test: 
-	@echo "Running tests..."
-	@go test -v ./...
+store-mock:
+	mockgen -destination internal/mock/store_mock.go  github.com/dewasurya/kakeiboku/apps/apiportal/internal/services Store
 
 .PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc test
