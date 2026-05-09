@@ -1,11 +1,18 @@
 package utils
 
-import "github.com/spf13/viper"
+import (
+	"time"
+
+	"github.com/spf13/viper"
+)
 
 
 type Config struct {
 	DB_URI  string `mapstructure:"DB_URI"`
 	Port    int    `mapstructure:"PORT"`
+	SecretKey string `mapstructure:"SECRET_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 

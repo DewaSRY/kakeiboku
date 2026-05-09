@@ -11,6 +11,7 @@ import (
 
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/database"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
@@ -21,6 +22,7 @@ type Server struct {
 	db    database.Service
 	store services.Store
 	config utils.Config
+	token token.TokenMaker
 }
 
 func NewServer() *http.Server {
@@ -33,11 +35,17 @@ func NewServer() *http.Server {
 		log.Fatal(err)
 	}
 
+	tokenMaker, err := token.NewJWTMaker(config.SecretKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	NewServer := &Server{
 		port:  port,
 		db:    database.New(),
 		store: services.NewStore(connPool),
 		config: config,
+		token: tokenMaker,
 	}
 
 	// Declare Server config

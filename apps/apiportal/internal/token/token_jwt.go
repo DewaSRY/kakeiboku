@@ -1,4 +1,4 @@
-package services
+package token
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ type JWTMaker struct {
 }
 
 // NewJWTMaker creates a new JWTMaker
-func NewJWTMaker(secretKey string) (Maker, error) {
+func NewJWTMaker(secretKey string) (TokenMaker, error) {
 	if len(secretKey) < minSecretKeySize {
 		return nil, fmt.Errorf("invalid key size: must be at least %d characters", minSecretKeySize)
 	}
@@ -26,8 +26,8 @@ func NewJWTMaker(secretKey string) (Maker, error) {
 }
 
 // CreateToken creates a new token for a specific username and duration
-func (maker *JWTMaker) CreateToken(username string, role string, duration time.Duration, tokenType TokenType) (string, *Payload, error) {
-	payload, err := NewPayload(username, role, duration, tokenType)
+func (maker *JWTMaker) CreateToken(userID int64, email string, duration time.Duration, tokenType TokenType) (string, *Payload, error) {
+	payload, err := NewPayload(userID, email, duration, tokenType)
 	if err != nil {
 		return "", payload, err
 	}
@@ -48,6 +48,7 @@ func (maker *JWTMaker) VerifyToken(token string, tokenType TokenType) (*Payload,
 	}
 
 	jwtToken, err := jwt.ParseWithClaims(token, &Payload{}, keyFunc)
+	
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, ErrExpiredToken

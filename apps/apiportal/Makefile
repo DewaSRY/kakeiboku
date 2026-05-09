@@ -69,13 +69,13 @@ watch:
 
 # example of usage  ` make migrate-create name=test`
 migrate-create: 
-	migrate create -ext sql -dir internal/database/migrations -seq $(name) 
+	migrate create -ext sql -dir internal/migrations -seq $(name) 
 
 migrate-up:
-	migrate -path internal/database/migrations -database "$(DB_URI)" -verbose up
+	migrate -path internal/migrations -database "$(DB_URI)" -verbose up
 	
 migrate-down:
-	migrate -path internal/database/migrations -database "$(DB_URI)" -verbose down
+	migrate -path internal/migrations -database "$(DB_URI)" -verbose down
 
 sqlc: 
 	sqlc generate
@@ -83,4 +83,4 @@ sqlc:
 store-mock:
 	mockgen -destination internal/mock/store_mock.go  github.com/dewasurya/kakeiboku/apps/apiportal/internal/services Store
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc test
+.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock
