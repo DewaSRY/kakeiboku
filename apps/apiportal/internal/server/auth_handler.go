@@ -78,3 +78,67 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 }
 
 
+func (server *Server) LoginHandler(ctx *gin.Context) {
+	var req LoginRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUserByEmail(ctx, req.Email)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	err = utils.CheckPassword(req.Password, user.PasswordHash)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	// create jwt token
+	access_token, access_payload, err := server.token.CreateToken(
+		user.ID,
+		user.Email,
+		server.config.AccessTokenDuration,
+		token.TokenTypeAccessToken)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	refresh_token, refresh_payload, err := server.token.CreateToken(
+		user.ID,
+		user.Email,
+		server.config.RefreshTokenDuration,
+		token.TokenTypeRefreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	session, err := server.store.CreateSession(ctx, services.CreateSessionParams{	
+		ID:           access_payload.ID,
+		Email:        user.Email,
+		RefreshToken: refresh_token,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+	})
+	
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, loginUserResponse{
+		SessionID:             session.ID,
+		AccessToken:           access_token,
+		AccessTokenExpiresAt:  access_payload.ExpiredAt,
+		RefreshToken:          refresh_token,
+		RefreshTokenExpiresAt: refresh_payload.ExpiredAt,
+	})
+}
+
+
