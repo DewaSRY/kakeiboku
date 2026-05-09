@@ -12,7 +12,7 @@ import (
 type Store interface {
 	Querier
 	CreateTransferTx(ctx context.Context, arg CreateTransactionParams) (*Transfer, error)
-	
+	SetSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 }
 
 // SqlStore provides all function to execute sql queries and transaction

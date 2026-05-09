@@ -15,12 +15,17 @@ type Querier interface {
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transfer, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetAccountByID(ctx context.Context, id int64) (Account, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
+	GetSessionsByEmailAndIp(ctx context.Context, arg GetSessionsByEmailAndIpParams) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
+	RefreshSession(ctx context.Context, arg RefreshSessionParams) (Session, error)
 	UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) (Account, error)
+	UpdateSession(ctx context.Context, arg UpdateSessionParams) (Session, error)
 	UpdateUserById(ctx context.Context, arg UpdateUserByIdParams) (User, error)
+	blockSession(ctx context.Context, id uuid.UUID) (Session, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -56,7 +56,7 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		return
 	}
 
-	session, err := server.store.CreateSession(ctx, services.CreateSessionParams{
+	session, err := server.store.SetSession(ctx, services.CreateSessionParams{
 		ID:           access_payload.ID,
 		Email:        user_created.Email,
 		RefreshToken: refresh_token,
@@ -119,14 +119,14 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	session, err := server.store.CreateSession(ctx, services.CreateSessionParams{	
+	session, err := server.store.SetSession(ctx, services.CreateSessionParams{	
 		ID:           access_payload.ID,
 		Email:        user.Email,
 		RefreshToken: refresh_token,
 		UserAgent:    ctx.Request.UserAgent(),
 		ClientIp:     ctx.ClientIP(),
 	})
-	
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
