@@ -27,8 +27,11 @@ type Server struct {
 
 func NewServer() *http.Server {
 	ctx := context.Background()
-	config, err := utils.LoadConfig("../../")
+	config, err := utils.LoadConfig(".")
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+
+
+	fmt.Println("config : ", config)
 
 	connPool, err := pgxpool.New(ctx, config.DB_URI)
 	if err != nil {
