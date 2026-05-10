@@ -1,4 +1,3 @@
-
 CREATE TABLE "user" (
   "id" bigserial PRIMARY KEY,
   "first_name" varchar NOT NULL,
