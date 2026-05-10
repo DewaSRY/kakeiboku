@@ -1,5 +1,5 @@
 # Simple Makefile for a Go project
-include .env
+include app.env
 export
 
 
@@ -8,7 +8,6 @@ all: build test
 
 build:
 	@echo "Building..."
-	
 	
 	@go build -o main cmd/api/main.go
 
@@ -37,6 +36,7 @@ docker-down:
 test:
 	@echo "Testing..."
 	@go test ./... -v
+
 # Integrations Tests for the application
 itest:
 	@echo "Running integration tests..."
@@ -68,15 +68,21 @@ watch:
 
 # example of usage  ` make migrate-create name=test`
 migrate-create: 
-	migrate create -ext sql -dir internal/database/migrations -seq $(name) 
+	migrate create -ext sql -dir internal/migrations -seq $(name) 
 
 migrate-up:
-	migrate -path internal/database/migrations -database "$(DB_URI)" -verbose up
+	migrate -path internal/migrations -database "$(DB_URI)" -verbose up
 	
 migrate-down:
-	migrate -path internal/database/migrations -database "$(DB_URI)" -verbose down
+	migrate -path internal/migrations -database "$(DB_URI)" -verbose down
 
 sqlc: 
 	sqlc generate
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc
+store-mock:
+	mockgen -destination internal/mock/store_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/internal/services Store
+
+token-mock:
+	mockgen -destination internal/mock/token_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/internal/token TokenMaker
+
+.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock token-mock

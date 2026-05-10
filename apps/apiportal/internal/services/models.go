@@ -2,11 +2,12 @@
 // versions:
 //   sqlc v1.31.1
 
-package db
+package services
 
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -17,6 +18,17 @@ type Account struct {
 	Currency  string         `json:"currency"`
 	CreatedAt time.Time      `json:"created_at"`
 	DeletedAt time.Time      `json:"deleted_at"`
+}
+
+type Session struct {
+	ID           uuid.UUID `json:"id"`
+	Email        string    `json:"email"`
+	RefreshToken string    `json:"refresh_token"`
+	UserAgent    string    `json:"user_agent"`
+	ClientIp     string    `json:"client_ip"`
+	IsBlocked    bool      `json:"is_blocked"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type Transfer struct {

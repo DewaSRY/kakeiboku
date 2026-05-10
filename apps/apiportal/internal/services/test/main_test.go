@@ -9,7 +9,9 @@ import (
 
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -29,6 +31,10 @@ func TestMain(m *testing.M) {
 		postgres.WithDatabase("testdb"),
 		postgres.WithUsername("user"),
 		postgres.WithPassword("password"),
+			testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).
+				WithStartupTimeout(5*time.Second)),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -95,7 +101,7 @@ func runMigrations(dbURI string) {
 	}
 
 	m, err := migrate.New(
-		"file://../../database/migrations",
+		"file://../../migrations",
 		migrateDbURI,
 	)
 	if err != nil {

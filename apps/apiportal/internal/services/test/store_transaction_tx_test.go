@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/database/sqlc"
+	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
 	"github.com/stretchr/testify/require"
 )
 
