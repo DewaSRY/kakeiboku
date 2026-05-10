@@ -101,7 +101,7 @@ func runMigrations(dbURI string) {
 	}
 
 	m, err := migrate.New(
-		"file://../../database/migrations",
+		"file://../../migrations",
 		migrateDbURI,
 	)
 	if err != nil {

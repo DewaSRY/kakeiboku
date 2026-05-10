@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) RegisterRoutes() http.Handler {
+func RegisterRoutes(server *Server) http.Handler {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
@@ -21,14 +21,18 @@ func (server *Server) RegisterRoutes() http.Handler {
 	v1_routes := router.Group("/v1")
 	v1_routes.Use(middleware.WebMiddleware)
 	v1_routes.GET("/", server.HelloWorldHandler)
-	v1_routes.GET("/health", server.healthHandler)
+	// v1_routes.GET("/health", server.healthHandler)
 
 	auth_routes := v1_routes.Group("/auth")
 	auth_routes.POST("/login", server.LoginHandler)
 	auth_routes.POST("/signup", server.SignUpHandler)
 
+	user_routes := v1_routes.Group("/users")
+	user_routes.Use(middleware.AuthMiddleware(server.Token))
+	user_routes.GET("/me", server.signInHandler)
+
 	account_routes := v1_routes.Group("/accounts")
-	account_routes.Use(middleware.AuthMiddleware(server.token))
+	account_routes.Use(middleware.AuthMiddleware(server.Token))
 
 	account_routes.POST("/", server.CreateAccountHandler)
 
@@ -42,6 +46,6 @@ func (server *Server) HelloWorldHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func (server *Server) healthHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, server.db.Health())
-}
+// func (server *Server) healthHandler(c *gin.Context) {
+// 	c.JSON(http.StatusOK, server.store.)
+// }

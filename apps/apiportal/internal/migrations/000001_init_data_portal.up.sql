@@ -3,7 +3,7 @@ CREATE TABLE "user" (
   "id" bigserial PRIMARY KEY,
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
-  "email" varchar NOT NULL,
+  "email" varchar NOT NULL UNIQUE ,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "password_hash" varchar NOT NULL
 );

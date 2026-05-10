@@ -14,6 +14,5 @@ func WebMiddleware(ctx *gin.Context)  {
 	if err == nil && len(access_token) > 0 	{
 		ctx.Request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", access_token))
 	}
-
 	ctx.Next()
 }

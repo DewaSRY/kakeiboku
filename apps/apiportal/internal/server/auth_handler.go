@@ -23,7 +23,7 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	user_created, err := server.store.CreateUser(ctx, services.CreateUserParams{
+	user_created, err := server.Store.CreateUser(ctx, services.CreateUserParams{
 		FirstName:    req.FirstName,
 		LastName:     req.LastName,
 		Email:        req.Email,
@@ -36,27 +36,27 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 	}
 
 	// create jwt token
-	access_token, access_payload, err := server.token.CreateToken(
+	access_token, access_payload, err := server.Token.CreateToken(
 		user_created.ID,
 		user_created.Email,
-		server.config.AccessTokenDuration,
+		server.Config.AccessTokenDuration,
 		token.TokenTypeAccessToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
-	refresh_token, refresh_payload, err := server.token.CreateToken(
+	refresh_token, refresh_payload, err := server.Token.CreateToken(
 		user_created.ID,
 		user_created.Email,
-		server.config.RefreshTokenDuration,
+		server.Config.RefreshTokenDuration,
 		token.TokenTypeRefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
-	_, err = server.store.SetSession(ctx, services.CreateSessionParams{
+	_, err = server.Store.SetSession(ctx, services.CreateSessionParams{
 		ID:           access_payload.ID,
 		Email:        user_created.Email,
 		RefreshToken: refresh_token,
@@ -68,8 +68,8 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		return
 	}
 
-	server.setCookies(ctx, utils.KeyAccessToken, access_token, int(server.config.AccessTokenDuration.Seconds()))
-	server.setCookies(ctx, utils.KeyRefreshToken, refresh_token, int(server.config.RefreshTokenDuration.Seconds()))
+	server.setCookies(ctx, utils.KeyAccessToken, access_token, int(server.Config.AccessTokenDuration.Seconds()))
+	server.setCookies(ctx, utils.KeyRefreshToken, refresh_token, int(server.Config.RefreshTokenDuration.Seconds()))
 
 	ctx.JSON(http.StatusOK, AuthResponse{
 		AccessToken:           access_token,
@@ -87,7 +87,7 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	user, err := server.store.GetUserByEmail(ctx, req.Email)
+	user, err := server.Store.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
@@ -100,27 +100,27 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 	}
 
 	// create jwt token
-	access_token, access_payload, err := server.token.CreateToken(
+	access_token, access_payload, err := server.Token.CreateToken(
 		user.ID,
 		user.Email,
-		server.config.AccessTokenDuration,
+		server.Config.AccessTokenDuration,
 		token.TokenTypeAccessToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
-	refresh_token, refresh_payload, err := server.token.CreateToken(
+	refresh_token, refresh_payload, err := server.Token.CreateToken(
 		user.ID,
 		user.Email,
-		server.config.RefreshTokenDuration,
+		server.Config.RefreshTokenDuration,
 		token.TokenTypeRefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
-	_, err = server.store.SetSession(ctx, services.CreateSessionParams{
+	_, err = server.Store.SetSession(ctx, services.CreateSessionParams{
 		ID:           access_payload.ID,
 		Email:        user.Email,
 		RefreshToken: refresh_token,
@@ -133,8 +133,8 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	server.setCookies(ctx, utils.KeyAccessToken, access_token, int(server.config.AccessTokenDuration.Seconds()))
-	server.setCookies(ctx, utils.KeyRefreshToken, refresh_token, int(server.config.RefreshTokenDuration.Seconds()))
+	server.setCookies(ctx, utils.KeyAccessToken, access_token, int(server.Config.AccessTokenDuration.Seconds()))
+	server.setCookies(ctx, utils.KeyRefreshToken, refresh_token, int(server.Config.RefreshTokenDuration.Seconds()))
 
 	ctx.JSON(http.StatusOK, AuthResponse{
 		AccessToken:           access_token,
@@ -152,29 +152,29 @@ func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 		return
 	}
 
-	refresh_token_payload, err := server.token.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)
+	refresh_token_payload, err := server.Token.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
 	}
 
-	user, err := server.store.GetUserByEmail(ctx, refresh_token_payload.Email)
+	user, err := server.Store.GetUserByEmail(ctx, refresh_token_payload.Email)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
 	}
 
-	access_token, access_payload, err := server.token.CreateToken(
+	access_token, access_payload, err := server.Token.CreateToken(
 		user.ID,
 		user.Email,
-		server.config.AccessTokenDuration,
+		server.Config.AccessTokenDuration,
 		token.TokenTypeAccessToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
 
-	server.setCookies(ctx, utils.KeyAccessToken, access_token, int(server.config.AccessTokenDuration.Seconds()))
+	server.setCookies(ctx, utils.KeyAccessToken, access_token, int(server.Config.AccessTokenDuration.Seconds()))
 
 	ctx.JSON(http.StatusOK, AuthResponse{
 		AccessToken:           access_token,
@@ -183,3 +183,5 @@ func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 		RefreshTokenExpiresAt: refresh_token_payload.ExpiredAt,
 	})
 }
+
+

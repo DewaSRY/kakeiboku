@@ -80,6 +80,9 @@ sqlc:
 	sqlc generate
 
 store-mock:
-	mockgen -destination internal/mock/store_mock.go  github.com/dewasurya/kakeiboku/apps/apiportal/internal/services Store
+	mockgen -destination internal/mock/store_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/internal/services Store
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock
+token-mock:
+	mockgen -destination internal/mock/token_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/internal/token TokenMaker
+
+.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock token-mock

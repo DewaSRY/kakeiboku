@@ -2,7 +2,7 @@
 // Source: github.com/dewasurya/kakeiboku/apps/apiportal/internal/services (interfaces: Store)
 
 // Package mock_services is a generated GoMock package.
-package mock_services
+package mock
 
 import (
 	context "context"
@@ -10,6 +10,7 @@ import (
 
 	services "github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MockStore is a mock of Store interface.
@@ -35,6 +36,21 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
+// BlockSession mocks base method.
+func (m *MockStore) BlockSession(arg0 context.Context, arg1 uuid.UUID) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BlockSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BlockSession indicates an expected call of BlockSession.
+func (mr *MockStoreMockRecorder) BlockSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockSession", reflect.TypeOf((*MockStore)(nil).BlockSession), arg0, arg1)
+}
+
 // CreateAccounts mocks base method.
 func (m *MockStore) CreateAccounts(arg0 context.Context, arg1 services.CreateAccountsParams) (services.Account, error) {
 	m.ctrl.T.Helper()
@@ -48,6 +64,21 @@ func (m *MockStore) CreateAccounts(arg0 context.Context, arg1 services.CreateAcc
 func (mr *MockStoreMockRecorder) CreateAccounts(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccounts", reflect.TypeOf((*MockStore)(nil).CreateAccounts), arg0, arg1)
+}
+
+// CreateSession mocks base method.
+func (m *MockStore) CreateSession(arg0 context.Context, arg1 services.CreateSessionParams) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateSession indicates an expected call of CreateSession.
+func (mr *MockStoreMockRecorder) CreateSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockStore)(nil).CreateSession), arg0, arg1)
 }
 
 // CreateTransaction mocks base method.
@@ -95,6 +126,21 @@ func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockStore)(nil).CreateUser), arg0, arg1)
 }
 
+// DeleteSession mocks base method.
+func (m *MockStore) DeleteSession(arg0 context.Context, arg1 uuid.UUID) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSession indicates an expected call of DeleteSession.
+func (mr *MockStoreMockRecorder) DeleteSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSession", reflect.TypeOf((*MockStore)(nil).DeleteSession), arg0, arg1)
+}
+
 // GetAccountByID mocks base method.
 func (m *MockStore) GetAccountByID(arg0 context.Context, arg1 int64) (services.Account, error) {
 	m.ctrl.T.Helper()
@@ -108,6 +154,36 @@ func (m *MockStore) GetAccountByID(arg0 context.Context, arg1 int64) (services.A
 func (mr *MockStoreMockRecorder) GetAccountByID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountByID", reflect.TypeOf((*MockStore)(nil).GetAccountByID), arg0, arg1)
+}
+
+// GetSession mocks base method.
+func (m *MockStore) GetSession(arg0 context.Context, arg1 uuid.UUID) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSession indicates an expected call of GetSession.
+func (mr *MockStoreMockRecorder) GetSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStore)(nil).GetSession), arg0, arg1)
+}
+
+// GetSessionsByEmailAndIp mocks base method.
+func (m *MockStore) GetSessionsByEmailAndIp(arg0 context.Context, arg1 services.GetSessionsByEmailAndIpParams) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSessionsByEmailAndIp", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSessionsByEmailAndIp indicates an expected call of GetSessionsByEmailAndIp.
+func (mr *MockStoreMockRecorder) GetSessionsByEmailAndIp(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionsByEmailAndIp", reflect.TypeOf((*MockStore)(nil).GetSessionsByEmailAndIp), arg0, arg1)
 }
 
 // GetUserByEmail mocks base method.
@@ -140,6 +216,36 @@ func (mr *MockStoreMockRecorder) GetUserByID(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockStore)(nil).GetUserByID), arg0, arg1)
 }
 
+// RefreshSession mocks base method.
+func (m *MockStore) RefreshSession(arg0 context.Context, arg1 services.RefreshSessionParams) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RefreshSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RefreshSession indicates an expected call of RefreshSession.
+func (mr *MockStoreMockRecorder) RefreshSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshSession", reflect.TypeOf((*MockStore)(nil).RefreshSession), arg0, arg1)
+}
+
+// SetSession mocks base method.
+func (m *MockStore) SetSession(arg0 context.Context, arg1 services.CreateSessionParams) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SetSession indicates an expected call of SetSession.
+func (mr *MockStoreMockRecorder) SetSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSession", reflect.TypeOf((*MockStore)(nil).SetSession), arg0, arg1)
+}
+
 // UpdateAccountBalance mocks base method.
 func (m *MockStore) UpdateAccountBalance(arg0 context.Context, arg1 services.UpdateAccountBalanceParams) (services.Account, error) {
 	m.ctrl.T.Helper()
@@ -153,6 +259,21 @@ func (m *MockStore) UpdateAccountBalance(arg0 context.Context, arg1 services.Upd
 func (mr *MockStoreMockRecorder) UpdateAccountBalance(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccountBalance", reflect.TypeOf((*MockStore)(nil).UpdateAccountBalance), arg0, arg1)
+}
+
+// UpdateSession mocks base method.
+func (m *MockStore) UpdateSession(arg0 context.Context, arg1 services.UpdateSessionParams) (services.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSession", arg0, arg1)
+	ret0, _ := ret[0].(services.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateSession indicates an expected call of UpdateSession.
+func (mr *MockStoreMockRecorder) UpdateSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSession", reflect.TypeOf((*MockStore)(nil).UpdateSession), arg0, arg1)
 }
 
 // UpdateUserById mocks base method.

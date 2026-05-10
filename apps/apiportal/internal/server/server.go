@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/database"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
@@ -18,20 +17,16 @@ import (
 )
 
 type Server struct {
-	port  int
-	db    database.Service
-	store services.Store
-	config utils.Config
-	token token.TokenMaker
+	Port  int
+	Store services.Store
+	Config utils.Config
+	Token token.TokenMaker
 }
 
-func NewServer() *http.Server {
+func NewServer(config utils.Config) *http.Server {
 	ctx := context.Background()
-	config, err := utils.LoadConfig(".")
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
-
-	fmt.Println("config : ", config)
 
 	connPool, err := pgxpool.New(ctx, config.DB_URI)
 	if err != nil {
@@ -43,18 +38,17 @@ func NewServer() *http.Server {
 		log.Fatal(err)
 	}
 
-	NewServer := &Server{
-		port:  port,
-		db:    database.New(),
-		store: services.NewStore(connPool),
-		config: config,
-		token: tokenMaker,
+	newServer := &Server{
+		Port:  port,
+		Store: services.NewStore(connPool),
+		Config: config,
+		Token: tokenMaker,
 	}
 
 	// Declare Server config
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", config.Port),
-		Handler:      NewServer.RegisterRoutes(),
+		Addr:         fmt.Sprintf(":%d", newServer.Port),
+		Handler:      RegisterRoutes(newServer),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,

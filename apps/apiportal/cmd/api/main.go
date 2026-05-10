@@ -10,11 +10,16 @@ import (
 	"time"
 
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/server"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
 )
 
 func main() {
+	config, err := utils.LoadConfig(".")
+	if err != nil {
+		log.Fatalf("cannot load config: %v", err)
+	}
 
-	server := server.NewServer()
+	server := server.NewServer(config)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
@@ -22,7 +27,7 @@ func main() {
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(server, done)
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))

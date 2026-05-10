@@ -40,7 +40,7 @@ DELETE FROM sessions
 WHERE id = $1
 RETURNING *;
 
--- name: blockSession :one
+-- name: BlockSession :one
 UPDATE sessions
 SET is_blocked = true
 WHERE id = $1

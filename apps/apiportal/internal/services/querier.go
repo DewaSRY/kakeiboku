@@ -11,6 +11,7 @@ import (
 )
 
 type Querier interface {
+	BlockSession(ctx context.Context, id uuid.UUID) (Session, error)
 	CreateAccounts(ctx context.Context, arg CreateAccountsParams) (Account, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transfer, error)
@@ -25,7 +26,6 @@ type Querier interface {
 	UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) (Account, error)
 	UpdateSession(ctx context.Context, arg UpdateSessionParams) (Session, error)
 	UpdateUserById(ctx context.Context, arg UpdateUserByIdParams) (User, error)
-	blockSession(ctx context.Context, id uuid.UUID) (Session, error)
 }
 
 var _ Querier = (*Queries)(nil)

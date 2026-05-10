@@ -27,7 +27,7 @@ func (s *Server) CreateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
-	_, err := s.store.CreateAccounts(ctx, db.CreateAccountsParams{
+	_, err := s.Store.CreateAccounts(ctx, db.CreateAccountsParams{
 		UserID:   1,
 		Balance:  utils.IntToPgTypeNumeric(0),
 		Currency: "",
