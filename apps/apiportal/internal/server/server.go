@@ -33,6 +33,10 @@ func NewServer(config utils.Config) *http.Server {
 		log.Fatal(err)
 	}
 
+	if err := connPool.Ping(ctx); err != nil {
+		log.Fatal("cannot connect to db:", err)
+	}
+
 	tokenMaker, err := token.NewJWTMaker(config.SecretKey)
 	if err != nil {
 		log.Fatal(err)

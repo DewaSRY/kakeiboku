@@ -13,8 +13,6 @@ func TestCreateAccount(t *testing.T){
 
 	user := createTestUser(t,ctx)
 
-
-
 	arg:=  db.CreateAccountsParams{
 		UserID: user.ID,
 		Balance: intToPgTypeNumeric(0),

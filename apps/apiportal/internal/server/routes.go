@@ -21,7 +21,7 @@ func RegisterRoutes(server *Server) http.Handler {
 	v1_routes := router.Group("/v1")
 	v1_routes.Use(middleware.WebMiddleware)
 	v1_routes.GET("/", server.HelloWorldHandler)
-	// v1_routes.GET("/health", server.healthHandler)
+	v1_routes.GET("/health", server.HealthHandler)
 
 	auth_routes := v1_routes.Group("/auth")
 	auth_routes.POST("/login", server.LoginHandler)

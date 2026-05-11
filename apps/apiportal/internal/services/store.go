@@ -13,6 +13,7 @@ type Store interface {
 	Querier
 	CreateTransferTx(ctx context.Context, arg CreateTransactionParams) (*Transfer, error)
 	SetSession(ctx context.Context, arg CreateSessionParams) (Session, error)
+	Health(ctx context.Context) StoreHealthRecord
 }
 
 // SqlStore provides all function to execute sql queries and transaction
@@ -47,4 +48,26 @@ func (t *SQLStore) ExecTX(ctx context.Context, fn func(*Queries) error) error {
 	}
 
 	return tx.Commit(ctx)
+}
+
+// Health checks the health of the database connection by pinging the database.
+func (t *SQLStore) Health(ctx context.Context) StoreHealthRecord {
+	var record StoreHealthRecord
+
+	err := t.connPool.Ping(ctx)
+	if err != nil {
+		record.Status = "down"
+		record.Error = fmt.Sprintf("db down: %v", err)
+		return record
+	}
+
+	poolStat := t.connPool.Stat()
+
+	return StoreHealthRecord{
+		Status:              "up",
+		Message:             "It's healthy",
+		TotalConnections:    poolStat.TotalConns(),
+		IdleConnections:     poolStat.IdleConns(),
+		AcquiredConnections: poolStat.AcquiredConns(),
+	}
 }
