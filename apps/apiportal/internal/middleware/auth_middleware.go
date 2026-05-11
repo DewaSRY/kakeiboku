@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

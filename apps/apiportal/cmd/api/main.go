@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/server"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 )
 
 func main() {

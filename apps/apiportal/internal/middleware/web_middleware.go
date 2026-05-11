@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

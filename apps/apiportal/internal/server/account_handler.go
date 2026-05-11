@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	db "github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

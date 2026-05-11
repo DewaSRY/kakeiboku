@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/middleware"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
 	"github.com/gin-gonic/gin"
 )
 

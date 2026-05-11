@@ -8,8 +8,8 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/middleware"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/mock"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/mock"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"

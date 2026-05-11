@@ -3,9 +3,9 @@ package server
 import (
 	"net/http"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
