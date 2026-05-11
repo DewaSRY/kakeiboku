@@ -1,6 +1,8 @@
 package server
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
@@ -23,7 +25,8 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	user_created, err := server.Store.CreateUser(ctx, services.CreateUserParams{
+
+	user_created, err := server.Store.CreateUserTx(ctx, services.CreateUserParams{
 		FirstName:    req.FirstName,
 		LastName:     req.LastName,
 		Email:        req.Email,
@@ -31,6 +34,11 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 	})
 
 	if err != nil {
+		if errors.Is(err, services.ErrCreatingUserWIthDuplicateEmail) {
+			ctx.JSON(http.StatusConflict, utils.ErrorResponse(fmt.Errorf("email %s already exists", req.Email)))
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}

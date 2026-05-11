@@ -13,6 +13,7 @@ type Store interface {
 	Querier
 	CreateTransferTx(ctx context.Context, arg CreateTransactionParams) (*Transfer, error)
 	SetSession(ctx context.Context, arg CreateSessionParams) (Session, error)
+	CreateUserTx(ctx context.Context, arg CreateUserParams) (User, error)
 	Health(ctx context.Context) StoreHealthRecord
 }
 

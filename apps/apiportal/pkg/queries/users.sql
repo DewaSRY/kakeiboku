@@ -10,7 +10,8 @@ INSERT INTO "user" (
 RETURNING *;
     
 -- name: GetUserByEmail :one
-SELECT * FROM "user" WHERE email = $1;
+SELECT * FROM "user" WHERE email = $1
+FOR NO KEY UPDATE;
 
 -- name: GetUserByID :one
 SELECT * FROM "user" WHERE id = $1;

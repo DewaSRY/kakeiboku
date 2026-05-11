@@ -26,9 +26,10 @@ func newFakePayload(email string) *token.Payload {
 
 func TestSignUpHandler(t *testing.T) {
 	test_case := []struct {
-		name          string
-		body          gin.H
-		buildStubs    func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker)
+		name       string
+		body       gin.H
+		buildStubs func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker)
+
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
@@ -40,7 +41,7 @@ func TestSignUpHandler(t *testing.T) {
 			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
 				var user services.User
 				gofakeit.Struct(&user)
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
 				tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(2).Return("token", newFakePayload(user.Email), nil)
 				store.EXPECT().SetSession(gomock.Any(), gomock.Any()).Times(1).Return(services.Session{}, nil)
@@ -53,7 +54,7 @@ func TestSignUpHandler(t *testing.T) {
 			name: "BadRequest_MissingFields",
 			body: gin.H{},
 			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(0)
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -66,11 +67,25 @@ func TestSignUpHandler(t *testing.T) {
 				"password": gofakeit.Password(true, true, true, true, false, 12),
 			},
 			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(1).
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).
 					Return(services.User{}, errors.New("db error"))
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "Conflict_DuplicateEmail",
+			body: gin.H{
+				"email":    gofakeit.Email(),
+				"password": gofakeit.Password(true, true, true, true, false, 12),
+			},
+			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).
+					Return(services.User{}, services.ErrCreatingUserWIthDuplicateEmail)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusConflict, recorder.Code)
 			},
 		},
 	}
