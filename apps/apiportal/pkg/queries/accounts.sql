@@ -20,4 +20,5 @@ RETURNING *;
 SELECT * FROM "accounts" WHERE id = $1
 FOR NO KEY UPDATE;
 
-
+-- name: GetAccountCount :one
+SELECT COUNT(*) FROM "accounts";  

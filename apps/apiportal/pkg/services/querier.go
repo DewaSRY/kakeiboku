@@ -18,6 +18,7 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetAccountByID(ctx context.Context, id int64) (Account, error)
+	GetAccountCount(ctx context.Context) (int64, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetSessionsByEmailAndIp(ctx context.Context, arg GetSessionsByEmailAndIpParams) (Session, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)

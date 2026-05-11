@@ -85,4 +85,9 @@ store-mock:
 token-mock:
 	mockgen -destination pkg/mock/token_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token TokenMaker
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock token-mock
+
+seed:
+	@go run cmd/seed/main.go
+
+
+.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock token-mock seed

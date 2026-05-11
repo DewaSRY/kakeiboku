@@ -156,6 +156,21 @@ func (mr *MockStoreMockRecorder) GetAccountByID(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountByID", reflect.TypeOf((*MockStore)(nil).GetAccountByID), arg0, arg1)
 }
 
+// GetAccountCount mocks base method.
+func (m *MockStore) GetAccountCount(arg0 context.Context) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAccountCount", arg0)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAccountCount indicates an expected call of GetAccountCount.
+func (mr *MockStoreMockRecorder) GetAccountCount(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountCount", reflect.TypeOf((*MockStore)(nil).GetAccountCount), arg0)
+}
+
 // GetSession mocks base method.
 func (m *MockStore) GetSession(arg0 context.Context, arg1 uuid.UUID) (services.Session, error) {
 	m.ctrl.T.Helper()
