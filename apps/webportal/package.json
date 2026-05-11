@@ -1,0 +1,30 @@
+{
+  "name": "webportal",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@netlify/nuxt": "0.3.1",
+    "@nuxt/eslint": "1.15.2",
+    "@nuxt/hints": "1.1.1",
+    "@nuxt/image": "2.0.0",
+    "@nuxt/test-utils": "4.0.3",
+    "@nuxt/ui": "4.7.1",
+    "@nuxthub/core": "0.10.7",
+    "@nuxtjs/google-fonts": "3.2.0",
+    "@nuxtjs/i18n": "10.3.0",
+    "eslint": "^10.3.0",
+    "nuxt": "^4.4.4",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.33",
+    "vue-router": "^5.0.6",
+    "zod": "^4.4.3"
+  }
+}
