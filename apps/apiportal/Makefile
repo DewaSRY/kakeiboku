@@ -35,12 +35,12 @@ docker-down:
 # Test the application
 test:
 	@echo "Testing..."
-	@go test ./... -v
+	@go test ./... -skip "_it_" -v
 
 # Integrations Tests for the application
-itest:
-	@echo "Running integration tests..."
-	@go test ./internal/database -v
+test-all:
+	@echo "Running all test..."
+	@go test ./... -v
 
 # Clean the binary
 clean:
@@ -90,4 +90,4 @@ seed:
 	@go run cmd/seed/main.go
 
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock token-mock seed
+.PHONY: all build run test clean watch docker-run docker-down test-all migrate-create migrate-up migrate-down sqlc store-mock token-mock seed
