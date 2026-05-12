@@ -3,14 +3,16 @@ package server
 import (
 	"net/http"
 
+	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/middleware"
 	db "github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type CreateAccountRequest struct {
 	Balance  float64 `json:"balance" binding:"required,min=0"`
-	Currency string  `json:"currency" binding:"required,oneof=USD EUR JPY"`
+	Currency string  `json:"currency" binding:"required,currency"`
 }
 
 type CreateAccountResponse struct {
@@ -27,10 +29,12 @@ func (s *Server) CreateAccountHandler(ctx *gin.Context) {
 		return
 	}
 
+	auth_payload := ctx.MustGet(middleware.AuthorizationPayloadKey).(*token.Payload)
+
 	_, err := s.Store.CreateAccounts(ctx, db.CreateAccountsParams{
-		UserID:   1,
+		UserID:   auth_payload.UserID,
 		Balance:  utils.IntToPgTypeNumeric(0),
-		Currency: "",
+		Currency: req.Currency,
 	})
 
 	if err != nil {
@@ -39,5 +43,4 @@ func (s *Server) CreateAccountHandler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, utils.CommonResponse("success create account"))
-
 }

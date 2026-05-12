@@ -9,9 +9,12 @@ import (
 	"strconv"
 	"time"
 
+	api_validator "github.com/dewasurya/kakeiboku/apps/apiportal/internal/validator"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -47,6 +50,11 @@ func NewServer(config utils.Config) *http.Server {
 		Store: services.NewStore(connPool),
 		Config: config,
 		Token: tokenMaker,
+	}
+
+	
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", api_validator.ValidCurrency)
 	}
 
 	// Declare Server config

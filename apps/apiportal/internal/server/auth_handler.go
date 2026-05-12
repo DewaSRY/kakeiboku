@@ -90,6 +90,8 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 func (server *Server) LoginHandler(ctx *gin.Context) {
 	var req LoginRequest
 
+	fmt.Printf("hit this end point")
+
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
@@ -160,7 +162,22 @@ func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 		return
 	}
 
-	refresh_token_payload, err := server.Token.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)
+	refresh_token := req.RefreshToken
+	if(req.RefreshToken == "" ) {
+		cookie, err := ctx.Cookie(utils.KeyRefreshToken)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(fmt.Errorf("refresh token is required")))
+			return
+		}
+		refresh_token = cookie
+	}
+
+	 if refresh_token == "" {
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(fmt.Errorf("refresh token is required")))
+		return
+	}
+
+	refresh_token_payload, err := server.Token.VerifyToken(refresh_token, token.TokenTypeRefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
@@ -187,7 +204,7 @@ func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, AuthResponse{
 		AccessToken:           access_token,
 		AccessTokenExpiresAt:  access_payload.ExpiredAt,
-		RefreshToken:          req.RefreshToken,
+		RefreshToken:          refresh_token,
 		RefreshTokenExpiresAt: refresh_token_payload.ExpiredAt,
 	})
 }

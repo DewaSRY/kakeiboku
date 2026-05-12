@@ -26,15 +26,16 @@ func RegisterRoutes(server *Server) http.Handler {
 	auth_routes := v1_routes.Group("/auth")
 	auth_routes.POST("/login", server.LoginHandler)
 	auth_routes.POST("/signup", server.SignUpHandler)
+	auth_routes.POST("/refresh-token", server.RefreshTokenHandler)
 
-	user_routes := v1_routes.Group("/users")
+	user_routes := v1_routes.Group("/user")
 	user_routes.Use(middleware.AuthMiddleware(server.Token))
 	user_routes.GET("/me", server.signInHandler)
 
 	account_routes := v1_routes.Group("/accounts")
 	account_routes.Use(middleware.AuthMiddleware(server.Token))
-
 	account_routes.POST("/", server.CreateAccountHandler)
+	
 
 	return router
 }

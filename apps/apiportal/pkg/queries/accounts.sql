@@ -21,4 +21,9 @@ SELECT * FROM "accounts" WHERE id = $1
 FOR NO KEY UPDATE;
 
 -- name: GetAccountCount :one
-SELECT COUNT(*) FROM "accounts";  
+SELECT COUNT(A.id) FROM "accounts" AS A;  
+
+-- name: ListUserAccounts :many
+SELECT * FROM "accounts" WHERE user_id = $1
+ORDER BY id
+LIMIT $2 OFFSET $3;
