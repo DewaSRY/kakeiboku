@@ -32,9 +32,10 @@ func RegisterRoutes(server *Server) http.Handler {
 	user_routes.Use(middleware.AuthMiddleware(server.Token))
 	user_routes.GET("/me", server.signInHandler)
 
-	account_routes := v1_routes.Group("/accounts")
+	account_routes := v1_routes.Group("/account")
 	account_routes.Use(middleware.AuthMiddleware(server.Token))
 	account_routes.POST("/", server.CreateAccountHandler)
+	account_routes.GET("/", server.GetAccountHandler)
 	
 
 	return router

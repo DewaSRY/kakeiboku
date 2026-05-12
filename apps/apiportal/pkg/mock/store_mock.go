@@ -216,6 +216,21 @@ func (mr *MockStoreMockRecorder) GetSessionsByEmailAndIp(arg0, arg1 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionsByEmailAndIp", reflect.TypeOf((*MockStore)(nil).GetSessionsByEmailAndIp), arg0, arg1)
 }
 
+// GetUserAccountCount mocks base method.
+func (m *MockStore) GetUserAccountCount(arg0 context.Context, arg1 int64) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserAccountCount", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserAccountCount indicates an expected call of GetUserAccountCount.
+func (mr *MockStoreMockRecorder) GetUserAccountCount(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAccountCount", reflect.TypeOf((*MockStore)(nil).GetUserAccountCount), arg0, arg1)
+}
+
 // GetUserByEmail mocks base method.
 func (m *MockStore) GetUserByEmail(arg0 context.Context, arg1 string) (services.User, error) {
 	m.ctrl.T.Helper()
@@ -258,6 +273,21 @@ func (m *MockStore) Health(arg0 context.Context) services.StoreHealthRecord {
 func (mr *MockStoreMockRecorder) Health(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockStore)(nil).Health), arg0)
+}
+
+// ListUserAccounts mocks base method.
+func (m *MockStore) ListUserAccounts(arg0 context.Context, arg1 services.ListUserAccountsParams) ([]services.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListUserAccounts", arg0, arg1)
+	ret0, _ := ret[0].([]services.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListUserAccounts indicates an expected call of ListUserAccounts.
+func (mr *MockStoreMockRecorder) ListUserAccounts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUserAccounts", reflect.TypeOf((*MockStore)(nil).ListUserAccounts), arg0, arg1)
 }
 
 // RefreshSession mocks base method.

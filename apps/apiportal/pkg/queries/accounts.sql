@@ -27,3 +27,7 @@ SELECT COUNT(A.id) FROM "accounts" AS A;
 SELECT * FROM "accounts" WHERE user_id = $1
 ORDER BY id
 LIMIT $2 OFFSET $3;
+
+-- name: GetUserAccountCount :one
+SELECT COUNT(A.id) FROM "accounts" AS A 
+WHERE A.user_id = $1;  
