@@ -14,7 +14,7 @@ import (
 func (server *Server) SignUpHandler(ctx *gin.Context) {
 	var req SignupRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := utils.BindJSON(ctx, &req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
@@ -92,7 +92,7 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 
 	fmt.Printf("hit this end point")
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := utils.BindJSON(ctx, &req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
@@ -157,7 +157,7 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 	var req RefreshTokenRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := utils.BindJSON(ctx, &req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
