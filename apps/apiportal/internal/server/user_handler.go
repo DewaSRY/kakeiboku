@@ -6,13 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
-
-
-
-
-
-
 func (server *Server) signInHandler	(ctx *gin.Context) {		
 
 	auth_payload := ctx.MustGet(middleware.AuthorizationPayloadKey).(*token.Payload)

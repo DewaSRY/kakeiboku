@@ -40,14 +40,3 @@ func RegisterRoutes(server *Server) http.Handler {
 
 	return router
 }
-
-func (server *Server) HelloWorldHandler(c *gin.Context) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
-	c.JSON(http.StatusOK, resp)
-}
-
-// func (server *Server) healthHandler(c *gin.Context) {
-// 	c.JSON(http.StatusOK, server.store.)
-// }

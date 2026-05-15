@@ -17,3 +17,11 @@ func (server *Server) HealthHandler(c *gin.Context) {
 
 	c.JSON(statusCode, stats)
 }
+
+
+func (server *Server) HelloWorldHandler(c *gin.Context) {
+	resp := make(map[string]string)
+	resp["message"] = "Hello World"
+
+	c.JSON(http.StatusOK, resp)
+}
