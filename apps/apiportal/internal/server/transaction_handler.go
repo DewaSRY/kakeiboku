@@ -24,7 +24,7 @@ func (server *Server) TransactionHandler(ctx *gin.Context) {
 
 	// auth_payload := ctx.MustGet(middleware.AuthorizationPayloadKey).(*token.Payload)
 
-	_, err := server.Store.CreateTransaction(ctx, services.CreateTransactionParams{
+	_, err := server.Store.CreateTransferTx(ctx, services.CreateTransactionParams{
 		FromAccountID: req.FromAccount,
 		ToAccountID:   req.ToAccount,
 		Amount:        utils.IntToPgTypeNumeric(req.Amount),
