@@ -36,7 +36,10 @@ func RegisterRoutes(server *Server) http.Handler {
 	account_routes.Use(middleware.AuthMiddleware(server.Token))
 	account_routes.POST("/", server.CreateAccountHandler)
 	account_routes.GET("/", server.GetAccountHandler)
-	
 
+	transaction_routes := v1_routes.Group("/transaction")
+	transaction_routes.Use(middleware.AuthMiddleware(server.Token))
+	transaction_routes.POST("/", server.TransactionHandler)
+	
 	return router
 }
