@@ -69,3 +69,5 @@ main
 
 *.env
 app.env
+
+__debug*

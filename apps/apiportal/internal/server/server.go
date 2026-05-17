@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	api_validator "github.com/dewasurya/kakeiboku/apps/apiportal/internal/validator"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -25,12 +26,18 @@ type Server struct {
 
 func NewServer(config utils.Config) *http.Server {
 	ctx := context.Background()
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-
 
 	connPool, err := pgxpool.New(ctx, config.DB_URI)
 	if err != nil {
 		log.Fatal(err)
+	}else{
+		log.Println("Successfully connected to the database")
+	}
+
+	if err := connPool.Ping(ctx); err != nil {
+		log.Fatal("cannot connect to db:", err)
+	}else {
+		log.Println("Successfully pinged the database")
 	}
 
 	tokenMaker, err := token.NewJWTMaker(config.SecretKey)
@@ -39,13 +46,16 @@ func NewServer(config utils.Config) *http.Server {
 	}
 
 	newServer := &Server{
-		Port:  port,
+		Port:  config.Port,
 		Store: services.NewStore(connPool),
 		Config: config,
 		Token: tokenMaker,
 	}
 
-	// Declare Server config
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", api_validator.ValidCurrency)
+	}
+
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", newServer.Port),
 		Handler:      RegisterRoutes(newServer),

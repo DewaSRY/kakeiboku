@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
+	db "github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 )

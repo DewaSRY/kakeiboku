@@ -21,31 +21,25 @@ func RegisterRoutes(server *Server) http.Handler {
 	v1_routes := router.Group("/v1")
 	v1_routes.Use(middleware.WebMiddleware)
 	v1_routes.GET("/", server.HelloWorldHandler)
-	// v1_routes.GET("/health", server.healthHandler)
+	v1_routes.GET("/health", server.HealthHandler)
 
 	auth_routes := v1_routes.Group("/auth")
 	auth_routes.POST("/login", server.LoginHandler)
 	auth_routes.POST("/signup", server.SignUpHandler)
+	auth_routes.POST("/refresh-token", server.RefreshTokenHandler)
 
-	user_routes := v1_routes.Group("/users")
+	user_routes := v1_routes.Group("/user")
 	user_routes.Use(middleware.AuthMiddleware(server.Token))
 	user_routes.GET("/me", server.signInHandler)
 
-	account_routes := v1_routes.Group("/accounts")
+	account_routes := v1_routes.Group("/account")
 	account_routes.Use(middleware.AuthMiddleware(server.Token))
-
 	account_routes.POST("/", server.CreateAccountHandler)
+	account_routes.GET("/", server.GetAccountHandler)
 
+	transaction_routes := v1_routes.Group("/transaction")
+	transaction_routes.Use(middleware.AuthMiddleware(server.Token))
+	transaction_routes.POST("/", server.TransactionHandler)
+	
 	return router
 }
-
-func (server *Server) HelloWorldHandler(c *gin.Context) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
-	c.JSON(http.StatusOK, resp)
-}
-
-// func (server *Server) healthHandler(c *gin.Context) {
-// 	c.JSON(http.StatusOK, server.store.)
-// }

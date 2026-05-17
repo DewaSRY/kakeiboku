@@ -48,6 +48,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id, first_name, last_name, email, created_at, password_hash FROM "user" WHERE email = $1
+FOR NO KEY UPDATE
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {

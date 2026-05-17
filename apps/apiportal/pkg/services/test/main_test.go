@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"

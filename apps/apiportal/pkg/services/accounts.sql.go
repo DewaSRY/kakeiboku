@@ -59,6 +59,68 @@ func (q *Queries) GetAccountByID(ctx context.Context, id int64) (Account, error)
 	return i, err
 }
 
+const getAccountCount = `-- name: GetAccountCount :one
+SELECT COUNT(A.id) FROM "accounts" AS A
+`
+
+func (q *Queries) GetAccountCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, getAccountCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getUserAccountCount = `-- name: GetUserAccountCount :one
+SELECT COUNT(A.id) FROM "accounts" AS A 
+WHERE A.user_id = $1
+`
+
+func (q *Queries) GetUserAccountCount(ctx context.Context, userID int64) (int64, error) {
+	row := q.db.QueryRow(ctx, getUserAccountCount, userID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const listUserAccounts = `-- name: ListUserAccounts :many
+SELECT id, user_id, balance, currency, created_at, deleted_at FROM "accounts" WHERE user_id = $1
+ORDER BY id
+LIMIT $2 OFFSET $3
+`
+
+type ListUserAccountsParams struct {
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListUserAccounts(ctx context.Context, arg ListUserAccountsParams) ([]Account, error) {
+	rows, err := q.db.Query(ctx, listUserAccounts, arg.UserID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Account{}
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Balance,
+			&i.Currency,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAccountBalance = `-- name: UpdateAccountBalance :one
 UPDATE "accounts"
 SET

@@ -1,18 +1,20 @@
 package server
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func (server *Server) SignUpHandler(ctx *gin.Context) {
 	var req SignupRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := utils.BindJSON(ctx, &req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
@@ -23,7 +25,8 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	user_created, err := server.Store.CreateUser(ctx, services.CreateUserParams{
+
+	user_created, err := server.Store.CreateUserTx(ctx, services.CreateUserParams{
 		FirstName:    req.FirstName,
 		LastName:     req.LastName,
 		Email:        req.Email,
@@ -31,6 +34,11 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 	})
 
 	if err != nil {
+		if errors.Is(err, services.ErrCreatingUserWIthDuplicateEmail) {
+			ctx.JSON(http.StatusConflict, utils.ErrorResponse(fmt.Errorf("email %s already exists", req.Email)))
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
@@ -82,7 +90,9 @@ func (server *Server) SignUpHandler(ctx *gin.Context) {
 func (server *Server) LoginHandler(ctx *gin.Context) {
 	var req LoginRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	fmt.Printf("hit this end point")
+
+	if err := utils.BindJSON(ctx, &req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
@@ -147,12 +157,27 @@ func (server *Server) LoginHandler(ctx *gin.Context) {
 func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 	var req RefreshTokenRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := utils.BindJSON(ctx, &req); err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
 
-	refresh_token_payload, err := server.Token.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)
+	refresh_token := req.RefreshToken
+	if(req.RefreshToken == "" ) {
+		cookie, err := ctx.Cookie(utils.KeyRefreshToken)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(fmt.Errorf("refresh token is required")))
+			return
+		}
+		refresh_token = cookie
+	}
+
+	 if refresh_token == "" {
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(fmt.Errorf("refresh token is required")))
+		return
+	}
+
+	refresh_token_payload, err := server.Token.VerifyToken(refresh_token, token.TokenTypeRefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, utils.ErrorResponse(err))
 		return
@@ -179,7 +204,7 @@ func (server *Server) RefreshTokenHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, AuthResponse{
 		AccessToken:           access_token,
 		AccessTokenExpiresAt:  access_payload.ExpiredAt,
-		RefreshToken:          req.RefreshToken,
+		RefreshToken:          refresh_token,
 		RefreshTokenExpiresAt: refresh_token_payload.ExpiredAt,
 	})
 }

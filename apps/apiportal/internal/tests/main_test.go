@@ -9,9 +9,9 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/server"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 )

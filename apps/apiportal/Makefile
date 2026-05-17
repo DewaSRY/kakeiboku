@@ -35,12 +35,12 @@ docker-down:
 # Test the application
 test:
 	@echo "Testing..."
-	@go test ./... -v
+	@go test ./... -skip "_it_" -v
 
 # Integrations Tests for the application
-itest:
-	@echo "Running integration tests..."
-	@go test ./internal/database -v
+test-all:
+	@echo "Running all test..."
+	@go test ./... -v
 
 # Clean the binary
 clean:
@@ -68,21 +68,26 @@ watch:
 
 # example of usage  ` make migrate-create name=test`
 migrate-create: 
-	migrate create -ext sql -dir internal/migrations -seq $(name) 
+	migrate create -ext sql -dir pkg/migrations -seq $(name) 
 
 migrate-up:
-	migrate -path internal/migrations -database "$(DB_URI)" -verbose up
+	migrate -path pkg/migrations -database "$(DB_URI)" -verbose up
 	
 migrate-down:
-	migrate -path internal/migrations -database "$(DB_URI)" -verbose down
+	migrate -path pkg/migrations -database "$(DB_URI)" -verbose down
 
 sqlc: 
 	sqlc generate
 
 store-mock:
-	mockgen -destination internal/mock/store_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/internal/services Store
+	mockgen -destination pkg/mock/store_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services Store
 
 token-mock:
-	mockgen -destination internal/mock/token_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/internal/token TokenMaker
+	mockgen -destination pkg/mock/token_mock.go -package mock  github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token TokenMaker
 
-.PHONY: all build run test clean watch docker-run docker-down itest migrate-create migrate-up migrate-down sqlc store-mock token-mock
+
+seed:
+	@go run cmd/seed/main.go
+
+
+.PHONY: all build run test clean watch docker-run docker-down test-all migrate-create migrate-up migrate-down sqlc store-mock token-mock seed

@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/mock"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/token"
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/mock"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/token"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -26,9 +26,10 @@ func newFakePayload(email string) *token.Payload {
 
 func TestSignUpHandler(t *testing.T) {
 	test_case := []struct {
-		name          string
-		body          gin.H
-		buildStubs    func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker)
+		name       string
+		body       gin.H
+		buildStubs func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker)
+
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
@@ -40,7 +41,7 @@ func TestSignUpHandler(t *testing.T) {
 			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
 				var user services.User
 				gofakeit.Struct(&user)
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
 				tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(2).Return("token", newFakePayload(user.Email), nil)
 				store.EXPECT().SetSession(gomock.Any(), gomock.Any()).Times(1).Return(services.Session{}, nil)
@@ -53,7 +54,7 @@ func TestSignUpHandler(t *testing.T) {
 			name: "BadRequest_MissingFields",
 			body: gin.H{},
 			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(0)
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -66,8 +67,58 @@ func TestSignUpHandler(t *testing.T) {
 				"password": gofakeit.Password(true, true, true, true, false, 12),
 			},
 			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(1).
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).
 					Return(services.User{}, errors.New("db error"))
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "Conflict_DuplicateEmail",
+			body: gin.H{
+				"email":    gofakeit.Email(),
+				"password": gofakeit.Password(true, true, true, true, false, 12),
+			},
+			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).
+					Return(services.User{}, services.ErrCreatingUserWIthDuplicateEmail)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusConflict, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError_CreateToken",
+			body: gin.H{
+				"email":    gofakeit.Email(),
+				"password": gofakeit.Password(true, true, true, true, false, 12),
+			},
+			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
+				var user services.User
+				gofakeit.Struct(&user)
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
+				tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(1).Return("", nil, errors.New("token error"))
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError_SetSession",
+			body: gin.H{
+				"email":    gofakeit.Email(),
+				"password": gofakeit.Password(true, true, true, true, false, 12),
+			},
+			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
+				var user services.User
+				gofakeit.Struct(&user)
+				store.EXPECT().CreateUserTx(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
+				tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(2).Return("token", newFakePayload(user.Email), nil)
+				store.EXPECT().SetSession(gomock.Any(), gomock.Any()).Times(1).
+					Return(services.Session{}, errors.New("session error"))
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -173,6 +224,38 @@ func TestLoginHandler(t *testing.T) {
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError_CreateToken",
+			body: gin.H{
+				"email":    fakeUser.Email,
+				"password": password,
+			},
+			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
+				store.EXPECT().GetUserByEmail(gomock.Any(), fakeUser.Email).Times(1).Return(fakeUser, nil)
+				tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(1).Return("", nil, errors.New("token error"))
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError_SetSession",
+			body: gin.H{
+				"email":    fakeUser.Email,
+				"password": password,
+			},
+			buildStubs: func(store *mock.MockStore, tokenMaker *mock.MockTokenMaker) {
+				store.EXPECT().GetUserByEmail(gomock.Any(), fakeUser.Email).Times(1).Return(fakeUser, nil)
+				tokenMaker.EXPECT().CreateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(2).Return("token", newFakePayload(fakeUser.Email), nil)
+				store.EXPECT().SetSession(gomock.Any(), gomock.Any()).Times(1).
+					Return(services.Session{}, errors.New("session error"))
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 	}

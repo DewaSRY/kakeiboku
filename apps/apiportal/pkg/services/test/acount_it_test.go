@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	db "github.com/dewasurya/kakeiboku/apps/apiportal/internal/services"
+	db "github.com/dewasurya/kakeiboku/apps/apiportal/pkg/services"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,8 +12,6 @@ func TestCreateAccount(t *testing.T){
 	ctx:= context.Background() 
 
 	user := createTestUser(t,ctx)
-
-
 
 	arg:=  db.CreateAccountsParams{
 		UserID: user.ID,

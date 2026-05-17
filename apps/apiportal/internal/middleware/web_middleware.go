@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 
-	"github.com/dewasurya/kakeiboku/apps/apiportal/internal/utils"
+	"github.com/dewasurya/kakeiboku/apps/apiportal/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +12,7 @@ func WebMiddleware(ctx *gin.Context)  {
 	access_token, err := ctx.Cookie(utils.KeyAccessToken)
 
 	if err == nil && len(access_token) > 0 	{
-		ctx.Request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", access_token))
+		ctx.Request.Header.Set(authorizationHeaderKey, fmt.Sprintf("Bearer %s", access_token))
 	}
 	ctx.Next()
 }
